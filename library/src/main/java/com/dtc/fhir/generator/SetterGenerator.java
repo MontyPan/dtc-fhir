@@ -6,34 +6,42 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import com.dtc.fhir.gwt.CodeableConcept;
-import com.dtc.fhir.gwt.Identifier;
-import com.dtc.fhir.gwt.Provenance;
-import com.dtc.fhir.gwt.ProvenanceAgent;
-import com.dtc.fhir.gwt.StringDt;
+import com.dtc.fhir.gwt.Element;
+import com.dtc.fhir.gwt.Extension;
+import com.dtc.fhir.gwt.Resource;
+
+import org.reflections.Reflections;
 
 import freemarker.template.Configuration;
 
 public class SetterGenerator {
 	public static void main(String[] args) throws Exception {
+		Reflections reflections = new Reflections("com.dtc.fhir.gwt");
+
 		HashMap<String, Object> data = new HashMap<>();
 
 		ArrayList<Class<?>> classList = new ArrayList<>();
 		data.put("classList", classList);
-		//TODO 自動產生 classList
-		classList.add(Provenance.class);
-		classList.add(CodeableConcept.class);
-		classList.add(Identifier.class);
-		classList.add(ProvenanceAgent.class);
-		classList.add(StringDt.class);
+		classList.addAll(reflections.getSubTypesOf(Resource.class));
+		classList.addAll(reflections.getSubTypesOf(Element.class));
+		classList.remove(Extension.class);
+		Collections.sort(classList, new Comparator<Class<?>>() {
+			@Override
+			public int compare(Class<?> o1, Class<?> o2) {
+				return o1.getSimpleName().compareTo(o2.getSimpleName());
+			}
+		});
 
 		ArrayList<String> implementList = new ArrayList<>();
 		data.put("implementList", implementList);
+
 		for (Class<?> clazz : classList) {
 			implementList.add(genImplement(clazz));
 		}
@@ -55,6 +63,8 @@ public class SetterGenerator {
 		for (Method method : clazz.getMethods()) {
 			if (method.getName().startsWith("get")) {
 				if (method.getName().startsWith("getClass")) { continue; }
+				if (method.getName().startsWith("getExtension")) { continue; }
+				if (method.getName().startsWith("getContained")) { continue; }
 
 				GetMethod getter = new GetMethod();
 				getMethod.add(getter);

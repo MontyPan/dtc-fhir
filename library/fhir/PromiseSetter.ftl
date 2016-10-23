@@ -5,11 +5,19 @@ import java.util.List;
 import com.dtc.fhir.gwt.*;
 
 public class PromiseSetter {
+	/**
+	 * @param path 例如：<code>a.b[0].c</code> 代表 getA().getB().get(0).setC()。
+	 * 	不支援 extension、contained、class 這幾個的 getter / setter。
+	 */
 	public static void set(Resource instance, String path, Object value) {
 		List<String> pathList = Arrays.asList(path.split("[..]"));
 		set(instance, pathList, value);
 	}
 
+	/**
+	 * @param path 例如：<code>a.b[0].c</code> 代表 getA().getB().get(0).setC()。
+	 * 	不支援 extension、contained、class 這幾個的 getter / setter。
+	 */
 	public static void set(Element instance, String path, Object value) {
 		List<String> pathList = Arrays.asList(path.split("[..]"));
 		set(instance, pathList, value);
@@ -39,10 +47,10 @@ public class PromiseSetter {
 	// ======== 以上是不會變動分隔線 ======== //
 	
 	private static void set(Object instance, List<String> path, Object value) {
-		switch (instance.getClass().getSimpleName()) {
+		switch (instance.getClass().getName()) {
 		<#list classList as clazz>
-		case "${clazz.simpleName}":
-			Set${clazz.simpleName}.set((${clazz.simpleName})instance, path, value);
+		case "${clazz.name}":
+			Set${clazz.simpleName}.set((${clazz.name})instance, path, value);
 			break;
 		</#list>
 		default:
