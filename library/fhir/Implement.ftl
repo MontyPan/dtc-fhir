@@ -20,7 +20,7 @@
 			<#list getterList as getter>
 			case "${getter.name}":
 				<#if getter.list>
-				if (value instanceof ${getter.listTypeName}) {
+				if (value instanceof ${getter.listTypeName} || value == null) {
 					List<${getter.listTypeName}> ${getter.name}List = instance.get${getter.name?cap_first}();
 					if (${getter.name}List.size() < index + 1) {
 						${getter.name}List.add((${getter.listTypeName})value);
@@ -31,7 +31,7 @@
 					throw new UnsupportedOperationException();
 				}
 				<#else>
-				if (value instanceof ${getter.returnTypeName}) {
+				if (value instanceof ${getter.returnTypeName} || value == null) {
 					instance.set${getter.name?cap_first}((${getter.returnTypeName})value);
 				} else {
 					throw new IllegalArgumentException("value is not a ${getter.returnTypeName}");
