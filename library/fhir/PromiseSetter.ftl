@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import com.dtc.fhir.gwt.*;
 
+// ==== 這是由 code generator 產生，請不要手動維護 ==== //
+
 public class PromiseSetter {
 	/**
 	 * @param path 例如：<code>a.b[0].c</code> 代表 getA().getB().get(0).setC()。
